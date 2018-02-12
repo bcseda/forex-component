@@ -88,7 +88,17 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _initialState = __webpack_require__(2);
+
+var _initialState2 = _interopRequireDefault(_initialState);
+
+var _storeFactory = __webpack_require__(3);
+
+var _storeFactory2 = _interopRequireDefault(_storeFactory);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var store = (0, _storeFactory2.default)(_initialState2.default);
 
 var ForEx = function ForEx() {
   return _react2.default.createElement(
@@ -98,11 +108,99 @@ var ForEx = function ForEx() {
       'h1',
       null,
       'For-Ex'
+    ),
+    _react2.default.createElement(
+      'pre',
+      null,
+      JSON.stringify(store.state)
     )
   );
 };
 
 exports.default = ForEx;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var currencyNames = ['GPB', 'EUR', 'USD', 'CHF', 'JPY', 'CAD', 'CNY'];
+
+var GPB = currencyNames[0],
+    EUR = currencyNames[1],
+    USD = currencyNames[2],
+    CHF = currencyNames[3],
+    JPY = currencyNames[4],
+    CAD = currencyNames[5],
+    CNY = currencyNames[6];
+
+
+var currencies = [{
+  name: GPB,
+  order: 1,
+  weakerCurrencies: [{ id: USD, position: 0 }, { id: EUR, position: 1 }, { id: CHF, position: 1 }, { id: JPY, position: 1 }, { id: CAD, position: 2 }, { id: CNY, position: 6 }]
+}, {
+  name: EUR,
+  order: 2,
+  weakerCurrencies: [{ id: USD, position: 0 }, { id: CHF, position: 0 }, { id: JPY, position: 1 }, { id: CAD, position: 1 }, { id: CNY, position: 5 }]
+}, {
+  name: USD,
+  order: 3,
+  weakerCurrencies: [{ id: CHF, position: 0 }, { id: JPY, position: 1 }, { id: CAD, position: 1 }, { id: CNY, position: 5 }]
+}, {
+  name: CHF,
+  order: 4,
+  weakerCurrencies: [{ id: JPY, position: 1 }, { id: CAD, position: 1 }, { id: CNY, position: 5 }]
+}, {
+  name: JPY,
+  order: 5,
+  weakerCurrencies: [{ id: CAD, position: 1 }, { id: CNY, position: 4 }]
+}, {
+  name: CAD,
+  order: 6,
+  weakerCurrencies: [{ id: CNY, position: 3 }]
+}, {
+  name: CNY,
+  order: 7,
+  weakerCurrencies: []
+}];
+
+var certificates = currencyNames.map(function (x) {
+  return { name: x, count: 8 };
+});
+
+var initialState = {
+  currencies: currencies,
+  certificates: certificates
+};
+
+exports.default = initialState;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var storeFactory = function storeFactory(initialState) {
+  return {
+    state: _extends({}, initialState)
+  };
+};
+
+exports.default = storeFactory;
 
 /***/ })
 /******/ ]);
