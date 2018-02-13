@@ -84,6 +84,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
@@ -94,31 +96,60 @@ var _CurrencyRow2 = _interopRequireDefault(_CurrencyRow);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var CurrencyBoard = function CurrencyBoard(_ref) {
-  var store = _ref.store;
-  var currencies = store.state.currencies;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var CurrencyBoard = function (_React$Component) {
+  _inherits(CurrencyBoard, _React$Component);
+
+  function CurrencyBoard(props) {
+    _classCallCheck(this, CurrencyBoard);
+
+    var _this = _possibleConstructorReturn(this, (CurrencyBoard.__proto__ || Object.getPrototypeOf(CurrencyBoard)).call(this, props));
+
+    _this.state = props.store.state;
+    _this.strengthen = props.store.strengthenCurrency.bind(_this);
+    _this.weaken = props.store.weakenCurrency.bind(_this);
+    return _this;
+  }
+
+  _createClass(CurrencyBoard, [{
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
+
+      var currencies = this.state.currencies;
 
 
-  return _react2.default.createElement(
-    'div',
-    { id: 'currency-board' },
-    _react2.default.createElement(
-      'h3',
-      null,
-      'CurrencyBoard'
-    ),
-    _react2.default.createElement(
-      'ul',
-      null,
-      currencies.map(function (c) {
-        return _react2.default.createElement(_CurrencyRow2.default, {
-          key: c.name,
-          currency: c,
-          actions: store.actions });
-      })
-    )
-  );
-};
+      return _react2.default.createElement(
+        'div',
+        { id: 'currency-board' },
+        _react2.default.createElement(
+          'h3',
+          null,
+          'CurrencyBoard'
+        ),
+        _react2.default.createElement(
+          'ul',
+          null,
+          currencies.map(function (c) {
+            return _react2.default.createElement(_CurrencyRow2.default, {
+              key: c.name,
+              currency: c,
+              strengthen: _this2.strengthen,
+              weaken: _this2.weaken
+            });
+          })
+        )
+      );
+    }
+  }]);
+
+  return CurrencyBoard;
+}(_react2.default.Component);
 
 exports.default = CurrencyBoard;
 
@@ -197,17 +228,127 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var storeFactory = function storeFactory(initialState) {
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-  var strengthenCurrency = function strengthenCurrency() {};
-  var weakenCurrency = function weakenCurrency() {};
+var shiftDown = function shiftDown(p) {
+  return p + (p < 10);
+};
+
+var sort = function sort(arr) {
+  return arr.sort(function (a, b) {
+    return a.order - b.order;
+  });
+};
+
+var storeFactory = function storeFactory(initialState) {
+  var state = _extends({}, initialState);
+
+  function strengthenCurrency(id) {
+    this.setState(function (prevState) {
+      var currencies = prevState.currencies;
+
+
+      var current = currencies.find(function (_ref) {
+        var name = _ref.name;
+        return name === id;
+      });
+      var others = currencies.filter(function (c) {
+        return c !== current;
+      });
+
+      var flipped = others.filter(function (c) {
+        var weakeningCurrent = c.weakerCurrencies.find(function (w) {
+          return w.id === current.name;
+        });
+        return weakeningCurrent && weakeningCurrent.position === 0;
+      }).map(function (c) {
+        return {
+          id: c.name,
+          position: 0
+        };
+      });
+
+      var adjustedOthers = others.map(function (c) {
+        var weakerCurrencies = c.weakerCurrencies.map(function (w) {
+          return {
+            id: w.id,
+            position: w.position - (w.id === current.name)
+          };
+        }).filter(function (w) {
+          return w.position >= 0;
+        });
+
+        return Object.assign({}, c, { weakerCurrencies: weakerCurrencies });
+      });
+
+      var adjustedCurrent = Object.assign({}, current, {
+        weakerCurrencies: [].concat(_toConsumableArray(flipped), _toConsumableArray(current.weakerCurrencies.map(function (c) {
+          return { id: c.id, position: shiftDown(c.position) };
+        })))
+      });
+
+      return {
+        currencies: sort([adjustedCurrent].concat(_toConsumableArray(adjustedOthers)))
+      };
+    });
+  }
+
+  function weakenCurrency(id) {
+    this.setState(function (prevState) {
+      var currencies = prevState.currencies;
+
+      var current = currencies.find(function (_ref2) {
+        var name = _ref2.name;
+        return name === id;
+      });
+      var others = currencies.filter(function (c) {
+        return c !== current;
+      });
+      var flipped = current.weakerCurrencies.filter(function (w) {
+        return w.position === 0;
+      });
+      var adjustedCurrent = Object.assign({}, current, {
+        weakerCurrencies: current.weakerCurrencies.filter(function (w) {
+          return w.position > 0;
+        }).map(function (w) {
+          return {
+            id: w.id,
+            position: w.position - 1
+          };
+        })
+      });
+
+      var adjustedOthers = others.map(function (c) {
+        var weakerFlipped = flipped.filter(function (w) {
+          return w.id === c.name;
+        }).map(function (w) {
+          return {
+            id: current.name,
+            position: 0
+          };
+        });
+
+        return {
+          name: c.name,
+          order: c.order,
+          weakerCurrencies: [].concat(_toConsumableArray(weakerFlipped), _toConsumableArray(c.weakerCurrencies.map(function (w) {
+            return Object.assign({}, w, {
+              position: w.position + (w.id === current.name && w.position < 10)
+            });
+          })))
+        };
+      });
+
+      return {
+        currencies: sort([adjustedCurrent].concat(_toConsumableArray(adjustedOthers)))
+      };
+    });
+  }
 
   return {
-    state: _extends({}, initialState),
-    actions: {
-      strengthenCurrency: strengthenCurrency,
-      weakenCurrency: weakenCurrency
-    }
+    state: state,
+    strengthenCurrency: strengthenCurrency,
+    weakenCurrency: weakenCurrency
   };
 };
 
@@ -332,7 +473,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var CurrencyRow = function CurrencyRow(_ref) {
   var currency = _ref.currency,
-      actions = _ref.actions;
+      strengthen = _ref.strengthen,
+      weaken = _ref.weaken;
 
   var tokens = function tokens(position) {
     return currency.weakerCurrencies.filter(function (c) {
@@ -357,13 +499,17 @@ var CurrencyRow = function CurrencyRow(_ref) {
         _react2.default.createElement(
           'div',
           { className: 'btn btn-dec',
-            onClick: actions.weakenCurrency(currency.name) },
+            onClick: function onClick() {
+              return weaken(currency.name);
+            } },
           '-'
         ),
         _react2.default.createElement(
           'div',
           { className: 'btn btn-inc',
-            onClick: actions.strengthenCurrency(currency.name) },
+            onClick: function onClick() {
+              return strengthen(currency.name);
+            } },
           '+'
         )
       )
@@ -440,12 +586,7 @@ var ForEx = function ForEx() {
       null,
       'For-Ex'
     ),
-    _react2.default.createElement(_CurrencyBoard2.default, { store: store }),
-    _react2.default.createElement(
-      'pre',
-      null,
-      JSON.stringify(store.state)
-    )
+    _react2.default.createElement(_CurrencyBoard2.default, { store: store })
   );
 };
 

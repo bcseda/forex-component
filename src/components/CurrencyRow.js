@@ -2,7 +2,7 @@ import React from 'react';
 import { boardPositions } from '../constants';
 import CurrencyCell from './CurrencyCell';
 
-const CurrencyRow = ({ currency, actions }) => {
+const CurrencyRow = ({ currency, strengthen, weaken }) => {
   const tokens = (position) => (
     currency.weakerCurrencies.filter(c => c.position === position)
   );
@@ -13,11 +13,11 @@ const CurrencyRow = ({ currency, actions }) => {
         <div className="currency-row-title">{currency.name}</div>
         <div className="btn-group">
           <div className="btn btn-dec"
-            onClick={actions.weakenCurrency(currency.name)}>
+            onClick={() => weaken(currency.name)}>
             -
           </div>
           <div className="btn btn-inc"
-            onClick={actions.strengthenCurrency(currency.name)}>
+            onClick={() => strengthen(currency.name)}>
             +
           </div>
         </div>

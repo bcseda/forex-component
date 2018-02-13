@@ -11,7 +11,6 @@ const ForEx = () => (
   <div>
     <h1>For-Ex</h1>
     <CurrencyBoard store={store} />
-    <pre>{JSON.stringify(store.state)}</pre>
   </div>
 )
 
