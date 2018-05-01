@@ -1,0 +1,84 @@
+#currency-board {
+  background-color: #3b3c3b;
+  text-align: center;
+  color: #cccccc;
+  width: 900px;
+  margin: 10px; }
+
+.currency-row:after {
+  content: "";
+  display: table;
+  clear: both; }
+
+.currency-row-title-cell {
+  float: left;
+  width: 85px;
+  height: 87px;
+  text-align: center; }
+
+.currency-row-title {
+  display: inline-block;
+  width: 100%;
+  line-height: 50px; }
+
+.currency-row-title-cell .btn-group {
+  display: inline-block;
+  width: 100%;
+  font-size: 1.2em;
+  font-weight: bolder; }
+
+.currency-row-title-cell .btn {
+  float: left;
+  display: inline-block;
+  width: 50%;
+  cursor: pointer; }
+
+.currency-row-title-cell .btn:hover {
+  background-color: rgba(255, 255, 128, 0.3); }
+
+.currency-cell {
+  float: left;
+  width: 8%;
+  height: 85px;
+  border: 1px solid #cccccc; }
+
+.token {
+  font-size: 0.7em;
+  line-height: 1.6em;
+  font-weight: bold;
+  border: 1px solid #fff;
+  width: 45%;
+  text-align: center;
+  margin: 0.1em auto;
+  padding: 0px;
+  color: #fff;
+  background-color: transparent; }
+
+.label-GPB,
+.token-GPB {
+  background-color: #bd2929; }
+
+.label-EUR,
+.token-EUR {
+  background-color: #482ac1; }
+
+.label-USD,
+.token-USD {
+  background-color: #4aad4e; }
+
+.label-CHF,
+.token-CHF {
+  background-color: #8b78dc; }
+
+.label-JPY,
+.token-JPY {
+  background-color: gray; }
+
+.label-CAD,
+.token-CAD {
+  background-color: #a25506f7; }
+
+.label-CNY,
+.token-CNY {
+  background-color: #ded027;
+  color: #bd2929; }
